@@ -24,7 +24,7 @@ Para a fase de análise exploratória, inicialmente verificou-se a distribuiçã
 | TRANSFERENCIA | 206 |
 | DESISTENCIA | 2     |
 
-![Motivos de alta](/home/diego/faculdade/mineracao/t2/images/discharge_motive_countplot.png)
+![Motivos de alta](brateca/images/discharge_motive_countplot.png)
 
 Com isso, relatou-se que nesse sentido o dataset encontrava-se desbalanceado, o que afetou como as análises posteriores foram realizadas.
 
@@ -103,7 +103,7 @@ Foi gerada uma matriz de confusão objetivando mostrar o número de predições 
 | $Alta_{real}$   | 36813         | 312            |
 | $Obito_{real}$  | 73            | 2204           |
 
-![Matriz de confusão](/home/diego/faculdade/mineracao/t2/images/matriz-confusao-modelo.png)
+![Matriz de confusão](brateca/images/matriz-confusao-modelo.png)
 
 ## Validação cruzada
 A validação cruzada foi realizada para avaliar a estabilidade do modelo. Utilizou-se a métrica precisão da classe 1 (óbito) como critério para avaliar o modelo em cada fold.
