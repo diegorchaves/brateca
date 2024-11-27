@@ -24,8 +24,6 @@ Para a fase de análise exploratória, inicialmente verificou-se a distribuiçã
 | TRANSFERENCIA | 206 |
 | DESISTENCIA | 2     |
 
-![Motivos de alta](brateca/images/discharge_motive_countplot.png)
-
 Com isso, relatou-se que nesse sentido o dataset encontrava-se desbalanceado, o que afetou como as análises posteriores foram realizadas.
 
 Após isso, através de matrizes de correlação, explorou-se possíveis influencias entre as variáveis, onde as mais relevantes encontradas foram:
@@ -60,7 +58,7 @@ Os dados do dataset criado no processo de preparação foram carregados de um ar
 
 Em seguida, criou-se uma variável nova no conjunto de dados chamada de ```Obito```, que tem o valor 1 quando a ```Discharge_Motive == OBITO``` e 0 em qualquer outro caso.
 
-Selecionou-se como features relevantes para o modelo as variáveis ```Age```, ```Complications```, ```Interventions```, ```High_Alert```, ```Controlled```,```Different_Drugs```, ```Stay_Length```, ```Public```, ```Surgical```, ```Emergency``` e ```IC```.
+Selecionou-se como features relevantes para o modelo as variáveis ```Age```, ```Complications```, ```Interventions```, ```High_Alert```, ```Controlled```, ```Different_Drugs```, ```Stay_Length```, ```Public```, ```Surgical```, ```Emergency``` e ```IC```.
 
 E definiu-se como target a variável recém criada ```Obito```.
 
@@ -75,7 +73,7 @@ O modelo foi treinado com os dados balanceados, e a previsão foi realizada no c
 
 ## Avaliação do modelo
 
-Após o treinamento, realizamos a avaliação do modelo usando as métricas de precisão, recall, f1-score e AUC-ROC. A precisão e o recall são especialmente importantes devido ao desbalanceamento das classes, já que queremos garantir que o modelo seja eficaz em identificar casos de óbito, sem aumentar muito os falsos positivos.
+Após o treinamento, realizou-se a avaliação do modelo usando as métricas de precisão, recall, f1-score e AUC-ROC. A precisão e o recall são especialmente importantes devido ao desbalanceamento das classes, já que era é desejável garantir que o modelo seja eficaz em identificar casos de óbito, sem aumentar muito os falsos positivos.
 
 Os resultados foram:
 
@@ -85,6 +83,7 @@ Class | Precision | Recall | F1-Score | Support |
 | Óbito | 0.88 | 0.97 | 0.92 | 2277 |
 
 O modelo teve uma precisão de 0.88 para a classe óbito (classe 1), o que indica que, quando o modelo classifica um paciente como óbito, ele está correto em 88% dos casos. Já para as altas (classe 0), a precisão foi de 1.00, ou seja, todas as altas foram corretamente identificadas.
+No quesito *Recall*, o modelo apresentou ótimo desempenho, identificando corretamente 99% dos casos de não-óbito e 97% os casos de óbito.
 
 A AUC-ROC foi de 1.00, o que indica que o modelo tem um excelente desempenho na discriminação entre as classes (óbito e alta).
 
@@ -102,8 +101,6 @@ Foi gerada uma matriz de confusão objetivando mostrar o número de predições 
 |-----------------|---------------|----------------|
 | $Alta_{real}$   | 36813         | 312            |
 | $Obito_{real}$  | 73            | 2204           |
-
-![Matriz de confusão](brateca/images/matriz-confusao-modelo.png)
 
 ## Validação cruzada
 A validação cruzada foi realizada para avaliar a estabilidade do modelo. Utilizou-se a métrica precisão da classe 1 (óbito) como critério para avaliar o modelo em cada fold.
