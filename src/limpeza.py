@@ -1,14 +1,57 @@
 import pandas as pd
 
-df_admission = pd.read_csv("data/B1_Admission.csv")
-df_admission = df_admission.sample(frac=0.1, random_state=42)
+df = pd.read_csv('brateca2/B1_Exam.csv')
 
-df_admission['Age'] = (pd.to_datetime(df_admission['Admission_Date']) - pd.to_datetime(df_admission['Birth_Date'])).dt.days // 365
-df_admission['Stay_Length'] = (pd.to_datetime(df_admission['Discharge_Date']) - pd.to_datetime(df_admission['Admission_Date'])).dt.days
+agg_df = (
+    df.groupby(["Patient_ID", "Hospital_ID", "Exam_Name"])["Value"]
+    .mean()
+    .reset_index()
+    .rename(columns={"Value": "Average_Value"})
+)
 
-df_admission = df_admission.drop(['Admission_ID', 'Birth_Date', 'Admission_Date', 'Discharge_Date', 'Unnamed: 11', 'Unnamed: 12'], axis=1)
+agg_df.to_csv('Agg_Exams.csv')
+# agregacao das prescricoes
 
-df_admission['Discharge_Motive'] = df_admission['Discharge_Motive'].str.upper()
+df = pd.read_csv('brateca2/B1_Prescription.csv')
+df = df.drop(['Prescription_ID','Prescription_Date', 'Expiration_Date', 
+              'Pharmacy_Assessment', 'Assessment_Date'], axis=1)
+
+aggregated_df = df.groupby(["Patient_ID", "Hospital_ID"]).agg({
+    # valores booleanos: true se algum for true
+    "Public": "any",
+    "Surgical": "any",
+    "IC": "any",
+    "Obstetrics": "any",
+    "Emergency": "any",
+    "Ambulatory": "any",
+    "COVID-19": "any",
+    # valores numericos
+    "Allergy": "mean",
+    "Alerts": "sum",
+    "Prescription_Score": "mean",
+    "Score_One": "mean",
+    "Score_Two": "mean",
+    "Score_Three": "mean",
+    "Antibiotics": "mean",
+    "High_Alert": "mean",
+    "Controlled": "mean",
+    "Not_Default": "mean",
+    "Tube": "mean",
+    "Different_Drugs": "mean",
+    "Alert_Exams": "mean",
+    "Interventions": "sum",
+    "Complications": "sum"
+}).reset_index()
+
+aggregated_df.to_csv('Agg_Prescription.csv')
+
+df = pd.read_csv('brateca2/B1_Admission.csv')
+df['Age'] = (pd.to_datetime(df['Admission_Date']) - pd.to_datetime(df['Birth_Date'])).dt.days // 365
+df['Stay_Length_Days'] = (pd.to_datetime(df['Discharge_Date']) - pd.to_datetime(df['Admission_Date'])).dt.days
+
+df = df.drop(['Skin_Color', 'Admission_ID', 'Birth_Date', 'Admission_Date', 'Discharge_Date', 'Unnamed: 11', 'Unnamed: 12', 'Height', 'Weight'], axis=1)
+
+df['Discharge_Motive'] = df['Discharge_Motive'].str.upper()
 
 discharge_mapping = {
     'ALTA': 'ALTA',
@@ -58,30 +101,15 @@ discharge_mapping = {
     'ALTA PARA PRONTO ATENDIMENTO': 'ALTA',
     'ALTA DA PUERPERA E OBITO FETAL': 'ALTA',
     'ALTA INALTERADO': 'ALTA',
-    'TRANSFERENCIA - PSIQUIATRIA': 'ALTA'
+    'TRANSFERENCIA - PSIQUIATRIA': 'ALTA',
+    'OBITO COM NECROPSIA ATE 48HS PAC.EM ESTADO NAO AGONICO': 'OBITO',
+    'TRANSFERENCIA POR PSIQUIATRIA': 'TRANSFERENCIA',
+    'PERMANENCIA POR CARACTERISTICAS PROPRIAS DA DOENÇA': 'PERMANENCIA',
+    'INTERNADO P/DIAGNOSTICO': 'PERMANENCIA'
 }
 
-df_admission['Discharge_Motive'] = df_admission['Discharge_Motive'].replace(discharge_mapping)
+df['Discharge_Motive'] = df['Discharge_Motive'].replace(discharge_mapping)
 
-df_exam = pd.read_csv("data/B1_Exam.csv")
-df_exam = df_exam.sample(frac=0.1, random_state=42)
-df_prescription = pd.read_csv("data/B1_Prescription.csv")
-df_prescription = df_prescription.sample(frac=0.1, random_state=42)
+df = pd.get_dummies(df, columns=['Sex'], drop_first=False)
 
-df_exam = df_exam.drop(['Admission_ID'], axis=1)
-df_prescription = df_prescription.drop(['Admission_ID', 'Prescription_ID', 'Prescription_Date', 'Expiration_Date', 'Assessment_Date'], axis=1)
-
-df = pd.merge(df_admission, df_exam, on=['Hospital_ID', 'Patient_ID'], how='inner')
-df = pd.merge(df, df_prescription, on=['Hospital_ID', 'Patient_ID'], how='inner')
-
-df = df.drop(['Hospital_ID', 'Patient_ID', 'Skin_Color', 'Weight', 'Height', 'Exam_Date', 'Pharmacy_Assessment', 'Unit'], axis=1)
-df = df.dropna()
-
-# One-hot encoding
-df = pd.get_dummies(df, columns=['Sex', 'Exam_Name'], drop_first=True)
-
-print(df.head)
-print(df.dtypes)
-print(df.columns)
-
-df.to_csv('data/dataset.csv')
+df.to_csv('Remap_Admission.csv')
